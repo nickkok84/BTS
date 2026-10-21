@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BTS Quiz">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f3f1f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14111d" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<title>BTS Concert Prep Quiz</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237b4fd6'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='800' font-size='22' fill='white' text-anchor='middle'%3EBTS%3C/text%3E%3C/svg%3E">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: one-column "ticket stub" quiz — chapter chips, one question card at a time, explanation tear-off below */
+:root{
+  --bg:#f3f1f8; --surface:#ffffff; --ink:#1d1830; --muted:#625b78; --line:#dcd6ea;
+  --accent:#7b4fd6; --accent-ink:#ffffff; --accent-soft:#ece4fb;
+  --good:#1f8a5b; --good-soft:#e2f4ea; --bad:#c2414b; --bad-soft:#fbe6e8;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14111d; --surface:#1e1a2b; --ink:#efeaf9; --muted:#a69fbd; --line:#342e47;
+  --accent:#a985f2; --accent-ink:#14111d; --accent-soft:#2b2340;
+  --good:#5cc993; --good-soft:#163228; --bad:#ef7d86; --bad-soft:#3a1d22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14111d; --surface:#1e1a2b; --ink:#efeaf9; --muted:#a69fbd; --line:#342e47;
+  --accent:#a985f2; --accent-ink:#14111d; --accent-soft:#2b2340;
+  --good:#5cc993; --good-soft:#163228; --bad:#ef7d86; --bad-soft:#3a1d22; color-scheme:dark}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,summary{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,7vw,40px);line-height:1.05;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0;max-width:60ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 14px var(--body);min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card-top{padding:20px 20px 18px;display:flex;flex-direction:column;gap:14px}
+.qtag{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.q{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.25;margin:0;text-wrap:balance}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;font:500 17px var(--body);min-height:52px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt b{font-family:var(--display);color:var(--muted);min-width:1.2em}
+@media (hover:hover){.opt:hover:not(:disabled),.chip:hover{border-color:var(--accent)}}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.stub{border-top:2px dashed var(--line);padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.verdict{font-weight:600}
+.verdict.good{color:var(--good)} .verdict.bad{color:var(--bad)}
+.why{margin:0;color:var(--ink)}
+.btn{font:600 16px var(--body);min-height:48px;padding:12px 20px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;align-self:flex-start}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.score{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.missed{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.missed li{border-left:3px solid var(--bad);padding-left:12px}
+.missed .mq{font-weight:600}
+.missed .ma{color:var(--muted);font-size:15px}
+.facts{background:var(--accent-soft);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px}
+.facts dt{color:var(--muted);font-weight:600}
+.facts dd{margin:0;min-width:0}
+.story{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 18px}
+.story summary{font-weight:600;cursor:pointer;min-height:28px}
+.keys{font-size:13px;color:var(--muted);display:none}
+.keys kbd{font:600 12px var(--body);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--surface)}
+@media (hover:hover) and (pointer:fine){.keys{display:block}}
+.tl{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.tl li{display:grid;grid-template-columns:4.6em 1fr;gap:12px;font-size:15px}
+.tl li>div{min-width:0}
+.tl span{font-family:var(--display);font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.foot{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+/* iPad portrait and up: roomier single column */
+@media (min-width:700px){
+  body{font-size:17px;padding-block:32px 64px}
+  .wrap{max-width:720px;gap:22px}
+  .card-top{padding:28px 28px 24px;gap:18px}
+  .stub{padding:20px 28px 26px}
+  .q{font-size:25px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+}
+/* iPad landscape and PC: side panel + quiz */
+@media (min-width:1024px){
+  .wrap{max-width:1160px;display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:20px 40px;align-items:start}
+  .side{position:sticky;top:max(24px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:18px;max-height:calc(100vh - 48px);overflow:auto}
+  .main{grid-column:2;grid-row:1 / span 3;min-width:0;display:flex;flex-direction:column;gap:18px}
+  .foot{grid-column:1}
+  h1{font-size:42px}
+  .q{font-size:28px}
+}
+@media (min-width:700px) and (max-width:1023px){.side,.main{display:contents}}
+@media (max-width:699px){.side,.main{display:contents}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+ <div class="side">
+  <header>
+    <span class="eyebrow">ARIRANG World Tour · National Stadium · Dec 2026</span>
+    <h1>BTS Concert Prep Quiz</h1>
+    <p class="sub">Learn the group from zero before the Singapore shows. Pick a chapter or take all of it. The History chapter runs in order from 2013, so you get the story as you go.</p>
+  </header>
+
+  <dl class="facts" aria-label="Singapore show facts">
+    <dt>Dates</dt><dd>17, 19, 20, 22 Dec 2026, 7pm</dd>
+    <dt>Venue</dt><dd>National Stadium, Kallang</dd>
+    <dt>Stage</dt><dd>360° centre stage, first time on a BTS tour</dd>
+  </dl>
+
+  <details class="story">
+    <summary>The story so far, 2013 to 2026</summary>
+    <ol class="tl">
+      <li><span>2013</span><div><b>Debut.</b> A hip-hop group from a small agency, Big Hit. Debut song: No More Dream.</div></li>
+      <li><span>2015–16</span><div><b>Breakthrough.</b> The Most Beautiful Moment in Life series, first music show win (I Need U), then WINGS and their first grand prize in Korea.</div></li>
+      <li><span>2017–18</span><div><b>America notices.</b> Billboard Music Award, AMAs debut with DNA, Love Yourself series, first Korean No. 1 album in the US, RM's UN speech.</div></li>
+      <li><span>2019</span><div><b>Stadiums.</b> Boy With Luv, two nights at Wembley, and the National Stadium in Singapore.</div></li>
+      <li><span>2020–21</span><div><b>Global peak.</b> Dynamite, Life Goes On, Butter and Permission to Dance all hit No. 1 in the US. First Grammy nomination.</div></li>
+      <li><span>2022–25</span><div><b>Pause.</b> PROOF anthology, a White House visit, a farewell concert in Busan, then military service. Solo albums from every member.</div></li>
+      <li><span>2026</span><div><b>Return.</b> ARIRANG album and title track SWIM both go to No. 1. The world tour reaches Singapore in December.</div></li>
+    </ol>
+  </details>
+
+  <div class="chips" id="chips" role="group" aria-label="Chapters"></div>
+  <p class="keys">Keyboard: <kbd>1</kbd>–<kbd>4</kbd> or <kbd>A</kbd>–<kbd>D</kbd> to answer, <kbd>Enter</kbd> for next.</p>
+ </div>
+ <div class="main">
+
+  <div id="quiz">
+    <div class="progress"><span id="count">Question 1 of 30</span><span id="tally">0 correct</span></div>
+    <div class="bar" style="margin:8px 0 14px"><i id="fill"></i></div>
+    <div class="card">
+      <div class="card-top">
+        <span class="qtag" id="qtag"></span>
+        <p class="q" id="qtext"></p>
+        <div class="opts" id="opts"></div>
+      </div>
+      <div class="stub" id="stub" hidden>
+        <span class="verdict" id="verdict"></span>
+        <p class="why" id="why"></p>
+        <button class="btn" id="next" type="button">Next question</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result" hidden>
+    <div class="card"><div class="card-top">
+      <span class="qtag">Your score</span>
+      <span class="score" id="final"></span>
+      <p class="sub" id="remark" style="margin:0"></p>
+      <div class="row">
+        <button class="btn" id="retryMissed" type="button">Retry the ones I missed</button>
+        <button class="btn ghost" id="restart" type="button">Start over</button>
+      </div>
+    </div>
+    <div class="stub" id="missedBox">
+      <span class="verdict">To revise</span>
+      <ul class="missed" id="missed"></ul>
+    </div></div>
+  </div>
+
+</div>
+  <p class="foot">Facts checked against official tour announcements and news coverage as of October 2026. Options are shuffled each time you play.</p>
+</div>
+
+<script>
+const Q = [
+ // The basics
+ {c:"Basics",q:"What does the name BTS stand for in Korean?",o:["Bangtan Sonyeondan (Bulletproof Boy Scouts)","Big Time Stars","Beyond The Stage","Boys of the Seoul"],a:0,w:"BTS is short for Bangtan Sonyeondan, meaning Bulletproof Boy Scouts. Since 2017 the group also says it stands for Beyond The Scene."},
+ {c:"Basics",q:"How many members are in BTS?",o:["5","7","9","13"],a:1,w:"Seven: RM, Jin, SUGA, j-hope, Jimin, V and Jung Kook. The media often call them a septet."},
+ {c:"Basics",q:"In what year did BTS debut?",o:["2010","2013","2016","2018"],a:1,w:"They debuted on 13 June 2013 under Big Hit Entertainment. Fans celebrate that date every year as the group's anniversary."},
+ {c:"Basics",q:"What is the BTS fandom called?",o:["Blinks","Once","ARMY","Carats"],a:2,w:"ARMY. The other options are fandoms of BLACKPINK, TWICE and SEVENTEEN, which makes this a classic trap."},
+ {c:"Basics",q:"Why did BTS pause group activities between 2022 and 2025?",o:["Contract dispute with their label","All seven members did South Korea's mandatory military service","A member left the group","They took a planned study break"],a:1,w:"Every member completed mandatory military service. They regrouped in June 2025 and started recording together that July."},
+ {c:"Basics",q:"Which label manages BTS?",o:["SM Entertainment","YG Entertainment","BigHit Music (under HYBE)","JYP Entertainment"],a:2,w:"BigHit Music, part of HYBE. HYBE also partnered with the Singapore Tourism Board and Klook to bring the tour here."},
+
+ // The members
+ {c:"Members",q:"Who is the leader of BTS?",o:["Jin","RM","SUGA","Jung Kook"],a:1,w:"RM (Kim Namjoon) is the leader and a rapper. He used to perform as Rap Monster."},
+ {c:"Members",q:"Who is the oldest member?",o:["Jin","SUGA","j-hope","RM"],a:0,w:"Jin (Kim Seokjin), born 4 December 1992. His birthday falls just before the Singapore run starts."},
+ {c:"Members",q:"Who is the 'maknae', the youngest member?",o:["V","Jimin","Jung Kook","j-hope"],a:2,w:"Jung Kook. 'Maknae' is Korean for the youngest in a group, and you'll hear fans use it a lot."},
+ {c:"Members",q:"SUGA also releases solo music under which name?",o:["Agust D","Lil Meow Meow","Hope World","Tonight"],a:0,w:"Agust D. Read it backwards: DT SUGA, after his hometown Daegu (D-Town) and his stage name."},
+ {c:"Members",q:"Which member is known as the group's 'dance captain'?",o:["RM","Jin","j-hope","V"],a:2,w:"j-hope (Jung Hoseok) leads choreography. His solo album is called Jack In The Box."},
+ {c:"Members",q:"What is V's real name?",o:["Kim Taehyung","Park Jimin","Min Yoongi","Jeon Jungkook"],a:0,w:"Kim Taehyung. Park Jimin is Jimin, Min Yoongi is SUGA and Jeon Jungkook is Jung Kook."},
+ {c:"Members",q:"Which two members are the group's main rappers alongside j-hope?",o:["Jin and Jimin","RM and SUGA","V and Jung Kook","Jimin and V"],a:1,w:"RM and SUGA, with j-hope, form the 'rap line'. Jin, Jimin, V and Jung Kook are the 'vocal line'."},
+ {c:"Members",q:"Which member's birthday is 30 December, a week after the last Singapore show?",o:["V","Jimin","SUGA","RM"],a:0,w:"V, born 30 December 1995. Jimin's is 13 October, SUGA's 9 March and RM's 12 September."},
+ {c:"Members",q:"Each member designed a BT21 cartoon character. Which one is RM's?",o:["Koya the koala","Chimmy the puppy","Shooky the cookie","Tata the heart-shaped alien"],a:0,w:"Koya, the sleepy blue koala. Chimmy is Jimin's, Shooky is SUGA's and Tata is V's. You'll see these all over the merch stalls."},
+
+ // The music
+ {c:"Music",q:"What is the name of BTS's 2026 comeback album?",o:["PROOF","BE","ARIRANG","WINGS"],a:2,w:"ARIRANG, released 20 March 2026. PROOF (2022), BE (2020) and WINGS (2016) are older releases."},
+ {c:"Music",q:"What does the album title 'Arirang' refer to?",o:["A Seoul neighbourhood","Korea's best-known folk song","The members' old dorm","A Korean film"],a:1,w:"Arirang is Korea's most famous folk song, recognised by UNESCO, with themes of longing and homecoming. It fits a reunion album."},
+ {c:"Music",q:"What is the title track of ARIRANG?",o:["SWIM","Dynamite","Butter","Take Two"],a:0,w:"SWIM. Both the song and the album debuted at No. 1 in the US. Expect it to be a big moment in the show."},
+ {c:"Music",q:"How many tracks are on ARIRANG?",o:["7","10","14","20"],a:2,w:"14 tracks. The members shaped it together in the second half of 2025."},
+ {c:"Music",q:"Which 2020 single was BTS's first song fully in English and became a global hit?",o:["Dynamite","Spring Day","Fake Love","Black Swan"],a:0,w:"Dynamite, the upbeat disco-pop song released during the pandemic. Butter (2021) followed in the same style."},
+ {c:"Music",q:"'Boy With Luv' (2019) featured which Western singer?",o:["Halsey","Taylor Swift","Ed Sheeran","Dua Lipa"],a:0,w:"Halsey. It's one of their most recognisable older hits and often appears in concert setlists."},
+ {c:"Music",q:"What was the last full-group studio album before ARIRANG?",o:["BE (2020)","Love Yourself: Tear (2018)","Map of the Soul: 7 (2020, Feb)","PROOF (2022)"],a:0,w:"BE, from November 2020. PROOF in 2022 was an anthology that collected older songs plus a few new ones, so it isn't counted as a studio album."},
+
+ // Singapore and the tour
+ {c:"Singapore",q:"Where in Singapore are the December shows?",o:["Singapore Indoor Stadium","National Stadium","The Star Theatre","Marina Bay Sands Expo"],a:1,w:"The National Stadium in Kallang. Stadium MRT is the closest station, and it gets very crowded after the show."},
+ {c:"Singapore",q:"How many nights is BTS playing in Singapore?",o:["1","2","4","6"],a:2,w:"Four nights: 17, 19, 20 and 22 December. It's the tour's longest Asia stop outside Korea and Japan."},
+ {c:"Singapore",q:"What is new about the stage on this tour?",o:["It floats on water","A 360-degree centre stage with fans on all sides","Members perform from separate stages in different cities","There is no stage, only screens"],a:1,w:"It's the first BTS tour with a 360-degree stage in the middle of the stadium floor, so every section gets a view."},
+ {c:"Singapore",q:"When did BTS last play Singapore as a full group?",o:["2014","2017","January 2019","2023"],a:2,w:"January 2019, on the Love Yourself tour at the National Stadium. They were the first K-pop act to sell it out."},
+ {c:"Singapore",q:"Where was BTS's very first Singapore concert in 2014?",o:["The Star Theatre","Esplanade","National Stadium","Zepp Big Box"],a:0,w:"The Star Theatre at Buona Vista, a 5,000-seat venue. A good measure of how much bigger they've become."},
+ {c:"Singapore",q:"Which member shot a solo music video in Singapore, featuring Gardens by the Bay and the Singapore Flyer?",o:["Jin","SUGA","Jimin","Jung Kook"],a:0,w:"Jin, for 'Don't Say You Love Me'. It also features the National Gallery Singapore."},
+ {c:"Singapore",q:"Where did the ARIRANG world tour open in April 2026?",o:["Tokyo Dome","Goyang Stadium, South Korea","Wembley Stadium","Las Vegas"],a:1,w:"Goyang, South Korea, on 9 April 2026. The tour runs to March 2027 and has grown to about 88 shows after extra dates were added."},
+ {c:"Singapore",q:"Which hit has been closing the main set on the ARIRANG tour?",o:["Dynamite","Spring Day","No More Dream","Idol"],a:0,w:"Dynamite closes the set, followed by a couple of rotating songs that change each night. Learn the chorus and you can sing along at the end."},
+ {c:"Singapore",q:"Which stadium drew BTS's biggest crowds per show so far on this tour?",o:["Stade de France, Paris","Wembley, London","Tokyo Dome","SoFi Stadium, Los Angeles"],a:0,w:"Stade de France, at about 92,500 people per show, the largest crowds of BTS's career. Singapore's National Stadium holds roughly 55,000."},
+ {c:"Singapore",q:"Which ARIRANG song have stadium crowds made a moment of, waving Korean flags and singing 'Arirang' along?",o:["Body to Body","Dynamite","Butter","Fake Love"],a:0,w:"Body to Body. At Stanford in May 2026, fans raised Korean flags and sang the folk song Arirang during it, which Korean media called one of the tour's most memorable moments."},
+
+ // History, in order
+ {c:"History",y:2013,q:"BTS debuted with the single album '2 Cool 4 Skool'. What was its title track?",o:["No More Dream","Boy In Luv","Danger","Run"],a:0,w:"No More Dream, a hard hip-hop track about young people being pushed to give up their dreams. BTS started as a hip-hop group, which surprises many new fans."},
+ {c:"History",y:2013,q:"Who put the group together and still produces for them?",o:["Bang Si-hyuk","Lee Soo-man","Park Jin-young","Yang Hyun-suk"],a:0,w:"Bang Si-hyuk, founder of Big Hit (now HYBE). The other three founded SM, JYP and YG, the big rival agencies of that time."},
+ {c:"History",y:2014,q:"Where did BTS make their first US appearance in 2014?",o:["KCON in Los Angeles","The Ellen Show","Coachella","Madison Square Garden"],a:0,w:"KCON, a Korean culture convention in Los Angeles. In 2014 they also won several rookie of the year awards and played their first Singapore show at The Star Theatre."},
+ {c:"History",y:2015,q:"Which album series from 2015 to 2016 is seen as their breakthrough era?",o:["The Most Beautiful Moment in Life (Hwa Yang Yeon Hwa)","Love Yourself","Map of the Soul","Dark & Wild"],a:0,w:"The Most Beautiful Moment in Life, known to fans as HYYH. It's about the anxiety and beauty of youth, and many fans call it their favourite era."},
+ {c:"History",y:2015,q:"Which song gave BTS their first win on a Korean TV music show?",o:["I Need U","Dope","Fire","Save Me"],a:0,w:"I Need U, in May 2015. Korean music shows hand out weekly trophies, and that first win was an emotional moment for the group."},
+ {c:"History",y:2016,q:"WINGS (2016) was the first K-pop album to do what?",o:["Enter the UK Official Albums Chart","Win a Grammy","Top the Billboard Hot 100","Sell 10 million copies"],a:0,w:"Enter the UK Official Albums Chart. Its title track Blood Sweat & Tears is one of their best-known songs from that period."},
+ {c:"History",y:2016,q:"In 2016 BTS won their first 'daesang'. What is a daesang?",o:["The grand prize at a Korean music awards show","A world tour","A No. 1 song in Japan","A gold record"],a:0,w:"A daesang is a grand prize. Their first was Artist of the Year at the 2016 Mnet Asian Music Awards (MAMA). Winning one marks a group as top tier in Korea."},
+ {c:"History",y:2017,q:"In 2017 BTS became the first Korean group to win a Billboard Music Award. Which category?",o:["Top Social Artist","Top Duo/Group","Top New Artist","Song of the Year"],a:0,w:"Top Social Artist, voted by fans, beating Justin Bieber's six-year streak. It was the moment many Americans first heard of BTS."},
+ {c:"History",y:2017,q:"Which song did BTS perform at the 2017 American Music Awards, the first Korean group ever on that stage?",o:["DNA","Dynamite","Fake Love","Butter"],a:0,w:"DNA, from Love Yourself: Her. That album was their first to sell over a million copies."},
+ {c:"History",y:2017,q:"BTS ran a long campaign with UNICEF from 2017 to 2021. What was it called?",o:["Love Myself","Speak Up","Be Kind","Stay Strong"],a:0,w:"Love Myself, part of UNICEF's #ENDviolence work to protect children and young people from violence."},
+ {c:"History",y:2018,q:"Love Yourself: Tear (2018) was the first Korean album to do what?",o:["Hit No. 1 on the Billboard 200","Go platinum in Korea","Win a Grammy","Top the Japanese charts"],a:0,w:"Hit No. 1 on the Billboard 200, the main US album chart. Its lead single was Fake Love. Love Yourself: Answer reached No. 1 a few months later."},
+ {c:"History",y:2018,q:"In September 2018, which member gave a speech at the United Nations?",o:["RM","Jin","Jimin","V"],a:0,w:"RM, the leader, spoke in English about loving yourself and finding your own voice. BTS became the first Korean group to address a UN session."},
+ {c:"History",y:2019,q:"Which famous London stadium did BTS sell out for two nights in 2019?",o:["Wembley Stadium","Old Trafford","Twickenham","The O2"],a:0,w:"Wembley Stadium, on the Speak Yourself tour. Their 2019 Singapore show at the National Stadium was on the same Love Yourself tour."},
+ {c:"History",y:2019,q:"In 2019 BTS became the first group since which band to top the Billboard 200 three times in under a year?",o:["The Beatles","The Rolling Stones","Queen","One Direction"],a:0,w:"The Beatles. The third No. 1 was Map of the Soul: Persona, which included Boy With Luv featuring Halsey."},
+ {c:"History",y:2020,q:"Dynamite (2020) was the first song by a Korean act to do what?",o:["Reach No. 1 on the Billboard Hot 100","Be played at the Olympics","Top the UK singles chart","Win a Grammy"],a:0,w:"Reach No. 1 on the Billboard Hot 100, the main US singles chart. Released during the pandemic, it was meant to cheer people up."},
+ {c:"History",y:2020,q:"Life Goes On (2020) set which Hot 100 record?",o:["First mainly non-English song to debut at No. 1","Longest song ever at No. 1","Most weeks at No. 1","First instrumental at No. 1"],a:0,w:"It was the first song sung mostly in a language other than English to debut at No. 1. It was the lead single from BE."},
+ {c:"History",y:2021,q:"What did BTS earn in 2021 that no K-pop act had before?",o:["A Grammy nomination","An Oscar","A Nobel Peace Prize nomination","A Brit Award"],a:0,w:"A Grammy nomination, for Dynamite. More nominations followed in later years."},
+ {c:"History",y:2021,q:"How many weeks did Butter (2021) spend at No. 1 on the Hot 100?",o:["10","3","1","20"],a:0,w:"10 weeks, the longest run for any BTS song. Permission to Dance knocked it off for one week in between."},
+ {c:"History",y:2021,q:"At the 2021 American Music Awards, BTS won the top prize. What was it?",o:["Artist of the Year","Best Pop Group","Album of the Year","Best Live Act"],a:0,w:"Artist of the Year, the first time an Asian act won the AMAs' top award. In late 2021 they also played four sold-out nights at SoFi Stadium in Los Angeles."},
+ {c:"History",y:2022,q:"Why did BTS visit the White House in May 2022?",o:["To speak out against anti-Asian hate crimes","To receive a medal","To perform at an inauguration","To launch a vaccine campaign"],a:0,w:"President Biden invited them to speak about anti-Asian hate and inclusion, at the end of Asian American and Pacific Islander Heritage Month."},
+ {c:"History",y:2022,q:"Where was BTS's last full-group concert before military service?",o:["A free concert in Busan","Tokyo Dome","SoFi Stadium","Seoul Olympic Stadium"],a:0,w:"A free concert in Busan in October 2022, 'Yet To Come', supporting the city's World Expo bid. They didn't share a stage again as a group until April 2026."},
+ {c:"History",y:2022,q:"Which member was the first to enlist, in December 2022?",o:["Jin","RM","SUGA","Jung Kook"],a:0,w:"Jin, as the oldest. The others followed in 2023, while their solo albums kept coming out."},
+ {c:"History",y:2023,q:"For their 10th anniversary in June 2023, BTS released a single for fans. What was it called?",o:["Take Two","Yet To Come","Proof","Run BTS"],a:0,w:"Take Two, a thank-you to ARMY. It was their only group release between 2022 and 2026."},
+ {c:"History",y:2023,q:"Jimin's 'Like Crazy' made him the first Korean solo artist to do what?",o:["Top the Billboard Hot 100","Win a daesang","Play Wembley","Act in a Hollywood film"],a:0,w:"Top the Billboard Hot 100. During the hiatus every member released solo work, and Jung Kook's Seven also became a worldwide hit."},
+ {c:"History",y:2025,q:"In June 2025, which member was the last to finish military service, completing the group's reunion?",o:["SUGA","V","Jimin","RM"],a:0,w:"SUGA, who served as a social service worker, finished on 21 June 2025, just after the group's 12th anniversary. From July they were recording ARIRANG together."},
+ {c:"Singapore",q:"Can you bring your own water into the National Stadium?",o:["No, nothing is allowed","Yes, any bottle","Yes, non-glass bottles, but they must be empty at entry","Only sealed bottles"],a:2,w:"Non-glass bottles are allowed but must be emptied at the gate. You can refill inside, and food and drink are sold in the venue."}
+];
+
+const chapters = ["All","Basics","History","Members","Music","Singapore"];
+let pool=[], i=0, right=0, missed=[], chapter="All";
+
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
+
+function buildChips(){
+  $("chips").innerHTML="";
+  chapters.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="chip";b.type="button";b.id="chip-"+c;
+    const n=c==="All"?Q.length:Q.filter(q=>q.c===c).length;
+    b.textContent=c+" · "+n;
+    b.setAttribute("aria-pressed",c===chapter);
+    b.onclick=()=>{chapter=c;start(c==="All"?Q:Q.filter(q=>q.c===c));buildChips();};
+    $("chips").appendChild(b);
+  });
+}
+
+function start(list,retry){
+  const ordered=chapter==="History"&&!retry?list.slice().sort((a,b)=>a.y-b.y):shuffle(list);
+  pool=ordered.map(q=>{const order=shuffle(q.o.map((t,k)=>k));return {...q,o:order.map(k=>q.o[k]),a:order.indexOf(q.a)}});
+  i=0;right=0;missed=[];
+  $("quiz").hidden=false;$("result").hidden=true;render();
+}
+
+function render(){
+  const q=pool[i];
+  $("count").textContent=`Question ${i+1} of ${pool.length}`;
+  $("tally").textContent=`${right} correct`;
+  $("fill").style.width=(i/pool.length*100)+"%";
+  $("qtag").textContent=q.y?q.c+" · "+q.y:q.c;
+  $("qtext").textContent=q.q;
+  $("stub").hidden=true;
+  const box=$("opts");box.innerHTML="";
+  q.o.forEach((t,k)=>{
+    const b=document.createElement("button");
+    b.className="opt";b.type="button";b.id="opt-"+k;
+    b.innerHTML=`<b>${"ABCD"[k]}</b><span></span>`;b.lastChild.textContent=t;
+    b.onclick=()=>answer(k);box.appendChild(b);
+  });
+}
+
+function answer(k){
+  const q=pool[i],btns=[...$("opts").children];
+  btns.forEach(b=>b.disabled=true);
+  btns[q.a].classList.add("right");
+  const ok=k===q.a;
+  if(ok)right++;else{btns[k].classList.add("wrong");missed.push(Q.find(x=>x.q===q.q));}
+  $("verdict").textContent=ok?"Correct":"Not quite. The answer is "+q.o[q.a]+".";
+  $("verdict").className="verdict "+(ok?"good":"bad");
+  $("why").textContent=q.w;
+  $("tally").textContent=`${right} correct`;
+  $("next").textContent=i===pool.length-1?"See my score":"Next question";
+  $("stub").hidden=false;$("next").focus({preventScroll:true});
+  $("stub").scrollIntoView({block:"nearest",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
+}
+
+$("next").onclick=()=>{if(i<pool.length-1){i++;render();window.scrollTo({top:$("quiz").offsetTop-10});}else finish();};
+
+function finish(){
+  $("quiz").hidden=true;$("result").hidden=false;
+  $("final").textContent=`${right}/${pool.length}`;
+  const p=right/pool.length;
+  $("remark").textContent=p===1?"Perfect. You're ready for the stadium.":p>=.8?"Strong. A quick revision of the misses and you're set.":p>=.5?"Good progress. Go again and the facts will stick.":"A fine start. Retry the misses, then run the full quiz again.";
+  $("missedBox").hidden=!missed.length;$("retryMissed").hidden=!missed.length;
+  $("missed").innerHTML="";
+  missed.forEach(q=>{const li=document.createElement("li");
+    li.innerHTML='<div class="mq"></div><div class="ma"></div>';
+    li.firstChild.textContent=q.q;li.lastChild.textContent=q.o[q.a]+". "+q.w;$("missed").appendChild(li);});
+  try{const best=+localStorage.getItem("best-"+chapter)||0;if(right>best)localStorage.setItem("best-"+chapter,right);}catch(e){}
+  window.scrollTo({top:0});
+}
+$("retryMissed").onclick=()=>start(missed,true);
+$("restart").onclick=()=>start(chapter==="All"?Q:Q.filter(q=>q.c===chapter));
+
+document.addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey||$("quiz").hidden)return;
+  const k=e.key.toLowerCase(),idx="1234".indexOf(k)>-1?"1234".indexOf(k):"abcd".indexOf(k);
+  if($("stub").hidden){const b=$("opts").children[idx];if(idx>-1&&b){e.preventDefault();b.click();}}
+  else if(k==="enter"||k==="arrowright"||k===" "){e.preventDefault();$("next").click();}
+});
+buildChips();start(Q);
+</script>
+
+</body>
+</html>
